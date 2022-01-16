@@ -31,19 +31,23 @@ const options = {
     },
 };
 
-export const BarChart = ({aqiData}) => {
+export const BarChart = ({aqiData, cityId}) => {
 
-    console.info({aqiData});
+    // console.info({aqiData});
+
+    const labelData = !cityId ? aqiData : aqiData.filter(cityData => cityData.id === cityId);
+
+    // console.info({cityId, labelData});
 
     // const labels = [`Good`, `Satisfactory`, `Moderate`, `Poor`, `Very poor`, `Severe`];
-    const labels = aqiData.map(cityData => cityData.city);
+    const labels = labelData.map(cityData => cityData.city);
 
     const data = {
         labels,
         datasets: [
             {
                 label: 'AQI',
-                data: aqiData.map(cityData => cityData.aqi.toFixed(2)),
+                data: labelData.map(cityData => cityData.aqi.toFixed(2)),
                 backgroundColor: 'rgba(9,9,9,0.7)',
             }
         ],

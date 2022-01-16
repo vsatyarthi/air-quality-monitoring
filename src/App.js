@@ -16,6 +16,7 @@ const AirQualityStandards = [
 ];
 
 function App() {
+    const [currentCityId, setCurrentCityId] = useState(0);
     const [airQualityData, setAirQualityData] = useState([
         {
             "id": "bengaluru",
@@ -107,6 +108,11 @@ function App() {
         }
     }
 
+    const showSingleCity = (id) => {
+        setCurrentCityId(id);
+    }
+
+    const currentCityData = airQualityData.filter(cityData => cityData.id === currentCityId)?.[0];
     return (
         <div className="bg-neutral-100 w-screen h-screen">
             <h1 className="text-3xl font-bold font-bold text-center p-4">Air Quality Checker</h1>
@@ -123,9 +129,10 @@ function App() {
                         </tr>
                         </thead>
                         <tbody>
-                        {airQualityData.map(({city, aqi, timestamp}) => {
+                        {airQualityData.map(({id, city, aqi, timestamp}) => {
                             // console.info({airQualityData});
-                            return (<tr key={city} className={`text-center p-1 ${getSeverityClassName(aqi)}} cursor-pointer hover:border-solid hover:border-black hover:border-2 hover:border-solid hover:shadow-md shadow-inner`}>
+                            return (<tr key={city} onClick={() => showSingleCity(id)}
+                                        className={`text-center p-1 ${getSeverityClassName(aqi)}} cursor-pointer hover:border-solid hover:border-black hover:border-2 hover:border-solid hover:shadow-md shadow-inner`}>
                                 <td className="p-4">{city}</td>
                                 <td className={`p-4 ${getSeverityClassName(aqi)}`}>{aqi.toFixed(2)}</td>
                                 <td className="p-4 text-xs">{getElapsedTime(timestamp)}</td>
@@ -137,7 +144,15 @@ function App() {
                 </div>
 
                 <div className="flex flex-grow">
-                    <BarChart aqiData={airQualityData} standards={AirQualityStandards}/>
+                    {!currentCityId && <BarChart aqiData={airQualityData} standards={AirQualityStandards}/>}
+                    {currentCityId !== 0 && (
+                        <section>
+                            <button className="p-4 bg-neutral-500 text-white" onClick={() => setCurrentCityId(0)}>Back</button>
+                            <h1 className="text-6xl font-bold">{currentCityData?.city}</h1>
+                            <h1 className="text-3xl font-bold">{currentCityData?.aqi.toFixed(2)}</h1>
+                            <BarChart aqiData={airQualityData} standards={AirQualityStandards} cityId={currentCityId}/>
+                        </section>
+                    )}
                 </div>
             </div>
         </div>
