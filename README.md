@@ -8,7 +8,9 @@ Technologies used:
 
 - Tailwind CSS
 - React JS
-- Websocket
+- chart.js (base chart library)
+- react-chartjs-2 (react implementation of chart library)
+- Websocket (data of max 12 cities AQI)
 
 Please note this is only front-end that is dependent on the response of the websocket URL. A sample data is included
 within the file itself to test accordingly.
