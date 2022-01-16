@@ -7,7 +7,7 @@ const AirQualityStandards = [
     {min: 0, max: 50, label: `Good`, id: `good`},
     {min: 51, max: 100, label: `Satisfactory`, id: `satisfactory`},
     {min: 101, max: 200, label: `Moderate`, id: `moderate`},
-    {min: 201, max: 300, label: `Poor`, class: `poor`},
+    {min: 201, max: 300, label: `Poor`, id: `poor`},
     {min: 301, max: 400, label: `Very poor`, id: `veryPoor`},
     {min: 401, max: 500, label: `Severe`, id: `severe`},
 ];
@@ -16,40 +16,28 @@ function App() {
     const [airQualityData, setAirQualityData] = useState([
         {
             "city": "Bengaluru",
-            "aqi": 190.2365647798493
-        },
-        {
-            "city": "Kolkata",
-            "aqi": 198.30634136715327
-        },
-        {
-            "city": "Bhubaneswar",
-            "aqi": 102.418702554796
-        },
-        {
-            "city": "Chennai",
-            "aqi": 143.17230851168108
-        },
-        {
-            "city": "Pune",
-            "aqi": 219.81806791678665
+            "aqi": 15.00
         },
         {
             "city": "Hyderabad",
-            "aqi": 200.3927829018787
+            "aqi": 51
         },
         {
-            "city": "Indore",
-            "aqi": 51.054989335676645
+            "city": "Kolkata",
+            "aqi": 201
         },
         {
-            "city": "Jaipur",
-            "aqi": 141.5774127159125
+            "city": "Bhubaneswar",
+            "aqi": 301
         },
         {
-            "city": "Chandigarh",
-            "aqi": 48.23620326884353
-        }
+            "city": "Chennai",
+            "aqi": 401
+        },
+        {
+            "city": "Pune",
+            "aqi": 501
+        },
     ]); // default to start with
 
     useEffect(() => {
@@ -58,31 +46,32 @@ function App() {
         };
         client.onmessage = (message) => {
             let liveAqiData = JSON.parse(message.data);
+            // TODO: since sent time is not here, need to add timestamp to show `last updated at`
             // console.info({liveAqiData})
             setAirQualityData(liveAqiData);
         };*/
     },[]);
 
     const getSeverityClassName = (aqi) => {
-        const defaultClass = `unknown`;
+        const defaultSeverity = `bg-red-600 text-black-900 border-red-600`;
         const matchedStandard = AirQualityStandards.filter(standard => aqi >= standard.min && aqi <= standard.max);
-        let severityStyle = `bg-indigo-300 text-white border-indigo`;
-        if (!matchedStandard.length) return defaultClass;
-        switch (matchedStandard[0].id){
+        const id = (matchedStandard.length) ? matchedStandard[0].id : `severe`;
+        console.info({id});
+        switch (id){
             case `good`:
-                return `bg-green-100 text-green-900 border-green-100`;
+                return `bg-green-500 text-black-900 border-green-500 ${id}`;
             case `satisfactory`:
-                return `bg-green-300 text-green-900 border-green-300`;
+                return `bg-green-400 text-black-900 border-green-400 ${id}`;
             case `moderate`:
-                return `bg-green-300 text-green-900 border-green-300`;
+                return `bg-yellow-100 text-black-900 border-yellow-100 ${id}`;
             case `poor`:
-                return `bg-green-300 text-green-900 border-green-300`;
+                return `bg-yellow-300 text-black-900 border-yellow-300 ${id}`;
             case `veryPoor`:
-                return `bg-green-300 text-green-900 border-green-300`;
+                return `bg-red-400 text-black-900 border-red-400 ${id}`;
             case `severe`:
-                return `bg-green-300 text-green-900 border-green-300`;
+                return defaultSeverity;
             default:
-                return severityStyle;
+                return defaultSeverity;
         }
     }
 
@@ -101,7 +90,7 @@ function App() {
                 {airQualityData.map(({city, aqi}) => {
                     return (<tr key={city}>
                         <td className=" text-center p-2 bg-indigo-300 text-white border-indigo-800 border-solid border-2">{city}</td>
-                        <td className={` text-center p-2 bg-indigo-300 text-white border-indigo-800 border-solid border-2 ${getSeverityClassName(aqi)}`}>{aqi.toFixed(2)}</td>
+                        <td className={` text-center p-2 ${getSeverityClassName(aqi)}`}>{aqi.toFixed(2)}</td>
                         <td className=" text-center p-2 bg-indigo-300 text-white border-indigo-800 border-solid border-2">A few minute(s) ago</td>
                     </tr>);
                 })}
