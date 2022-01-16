@@ -2,6 +2,7 @@ import './App.css';
 import {useEffect, useState} from "react";
 import {w3cwebsocket as W3CWebSocket} from "websocket";
 import moment from 'moment';
+import {BarChart} from "./components/BarChart";
 
 const client = new W3CWebSocket('ws://city-ws.herokuapp.com/');
 const historyLimit = 10;
@@ -59,7 +60,7 @@ function App() {
                 receivedCityIDs.push(id);
                 let history;
                 if (existingCityIndex > -1) {
-                    if(airQualityData[existingCityIndex].history.length > historyLimit) airQualityData[existingCityIndex].history.splice(0, 1);
+                    if (airQualityData[existingCityIndex].history.length > historyLimit) airQualityData[existingCityIndex].history.splice(0, 1);
                     history = [...airQualityData[existingCityIndex].history, newVariant];
                 } else {
                     history = [newVariant];
@@ -73,7 +74,7 @@ function App() {
             });
             const filteredAqiData = airQualityData.filter(cityData => !receivedCityIDs.includes(cityData.id));
             // console.info({receivedCityIDs, airQualityData, filteredAqiData})
-            const updateAqiData = [...filteredAqiData, ...liveAqiData].sort((cityA,cityB) => cityA.aqi - cityB.aqi);
+            const updateAqiData = [...filteredAqiData, ...liveAqiData].sort((cityA, cityB) => cityA.city.localeCompare(cityB.city));
             setAirQualityData(updateAqiData);
             // client.close();
         };
@@ -124,15 +125,19 @@ function App() {
                 <tbody>
                 {airQualityData.map(({city, aqi, timestamp}) => {
                     // console.info({airQualityData});
-                    return (<tr key={city}>
-                        <td className=" text-center p-2 bg-indigo-300 text-white border-indigo-800 border-solid border-2">{city}</td>
-                        <td className={` text-center p-2 ${getSeverityClassName(aqi)}`}>{aqi.toFixed(2)}</td>
-                        <td className=" text-center p-2 bg-indigo-300 text-white border-indigo-800 border-solid border-2">{getElapsedTime(timestamp)}</td>
+                    return (<tr key={city} className={`text-center p-2 ${getSeverityClassName(aqi)}}`}>
+                        <td className="p-4">{city}</td>
+                        <td className={`p-4 ${getSeverityClassName(aqi)}`}>{aqi.toFixed(2)}</td>
+                        <td className="p-4">{getElapsedTime(timestamp)}</td>
                     </tr>);
                 })}
 
                 </tbody>
             </table>
+
+            <hr/>
+
+            <BarChart aqiData={airQualityData} standards={AirQualityStandards}/>
         </div>
 
     );
