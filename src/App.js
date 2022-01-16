@@ -1,8 +1,10 @@
 import './App.css';
 import {useEffect, useState} from "react";
-import { w3cwebsocket as W3CWebSocket } from "websocket";
+import {w3cwebsocket as W3CWebSocket} from "websocket";
+import moment from 'moment';
 
 const client = new W3CWebSocket('ws://city-ws.herokuapp.com/');
+const historyLimit = 10;
 const AirQualityStandards = [
     {min: 0, max: 50, label: `Good`, id: `good`},
     {min: 51, max: 100, label: `Satisfactory`, id: `satisfactory`},
@@ -15,49 +17,78 @@ const AirQualityStandards = [
 function App() {
     const [airQualityData, setAirQualityData] = useState([
         {
+            "id": "bengaluru",
             "city": "Bengaluru",
-            "aqi": 15.00
+            "aqi": 15.00,
+            "timestamp": 1642330361369,
+            "history": [
+                {aqi: 40, receivedAt: 1642330361369},
+                {aqi: 60, receivedAt: 1642330361380},
+                {aqi: 101, receivedAt: 1642330361700},
+                {aqi: 250, receivedAt: 1642330361800},
+                {aqi: 360, receivedAt: 1642330362000},
+            ],
         },
         {
+            "id": "hyderabad",
             "city": "Hyderabad",
-            "aqi": 51
-        },
-        {
-            "city": "Kolkata",
-            "aqi": 201
-        },
-        {
-            "city": "Bhubaneswar",
-            "aqi": 301
-        },
-        {
-            "city": "Chennai",
-            "aqi": 401
-        },
-        {
-            "city": "Pune",
-            "aqi": 501
+            "aqi": 51,
+            "timestamp": 1642330834559,
+            "history": [
+                {aqi: 40, receivedAt: 1642330361369},
+                {aqi: 60, receivedAt: 1642330361380},
+                {aqi: 101, receivedAt: 1642330361700},
+                {aqi: 250, receivedAt: 1642330361800},
+                {aqi: 360, receivedAt: 1642330362000},
+            ],
         },
     ]); // default to start with
 
     useEffect(() => {
-        /*client.onopen = () => {
+        client.onopen = () => {
             console.log('WebSocket Client Connected');
         };
+        const receivedCityIDs = [];
         client.onmessage = (message) => {
-            let liveAqiData = JSON.parse(message.data);
-            // TODO: since sent time is not here, need to add timestamp to show `last updated at`
-            // console.info({liveAqiData})
-            setAirQualityData(liveAqiData);
-        };*/
-    },[]);
+            const receivedAqiData = JSON.parse(message.data);
+            const liveAqiData = receivedAqiData.map(cityData => {
+                const existingCityIndex = airQualityData.findIndex(city => city.city === cityData.city);
+                const receivedAt = Date.now();
+                const newVariant = {aqi: cityData.aqi, receivedAt};
+                const id = cityData.city.toLowerCase().replace(' ', '');
+                receivedCityIDs.push(id);
+                let history;
+                if (existingCityIndex > -1) {
+                    if(airQualityData[existingCityIndex].history.length > historyLimit) airQualityData[existingCityIndex].history.splice(0, 1);
+                    history = [...airQualityData[existingCityIndex].history, newVariant];
+                } else {
+                    history = [newVariant];
+                }
+                return {
+                    ...cityData,
+                    id,
+                    receivedAt: receivedAt,
+                    history,
+                };
+            });
+            const filteredAqiData = airQualityData.filter(cityData => !receivedCityIDs.includes(cityData.id));
+            // console.info({receivedCityIDs, airQualityData, filteredAqiData})
+            const updateAqiData = [...filteredAqiData, ...liveAqiData].sort((cityA,cityB) => cityA.aqi - cityB.aqi);
+            setAirQualityData(updateAqiData);
+            // client.close();
+        };
+    }, [airQualityData]);
+
+    const getElapsedTime = timeStamp => {
+        return moment(timeStamp).fromNow();
+    }
 
     const getSeverityClassName = (aqi) => {
         const defaultSeverity = `bg-red-600 text-black-900 border-red-600`;
-        const matchedStandard = AirQualityStandards.filter(standard => aqi >= standard.min && aqi <= standard.max);
+        const matchedStandard = AirQualityStandards.filter(standard => Math.ceil(aqi) >= standard.min && Math.ceil(aqi) <= standard.max);
         const id = (matchedStandard.length) ? matchedStandard[0].id : `severe`;
-        console.info({id});
-        switch (id){
+        // console.info({matchedStandard, id, aqi});
+        switch (id) {
             case `good`:
                 return `bg-green-500 text-black-900 border-green-500 ${id}`;
             case `satisfactory`:
@@ -82,16 +113,21 @@ function App() {
                 <thead>
                 <tr>
                     <th className="text-center font-bold p-2 bg-indigo-700 text-white border-indigo-900 border-solid border-2">City</th>
-                    <th className="text-center font-bold p-2 bg-indigo-700 text-white border-indigo-900 border-solid border-2">Current AQI</th>
-                    <th className="text-center font-bold p-2 bg-indigo-700 text-white border-indigo-900 border-solid border-2">Last Updated</th>
+                    <th className="text-center font-bold p-2 bg-indigo-700 text-white border-indigo-900 border-solid border-2">Current
+                        AQI
+                    </th>
+                    <th className="text-center font-bold p-2 bg-indigo-700 text-white border-indigo-900 border-solid border-2">Last
+                        Updated
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
-                {airQualityData.map(({city, aqi}) => {
+                {airQualityData.map(({city, aqi, timestamp}) => {
+                    // console.info({airQualityData});
                     return (<tr key={city}>
                         <td className=" text-center p-2 bg-indigo-300 text-white border-indigo-800 border-solid border-2">{city}</td>
                         <td className={` text-center p-2 ${getSeverityClassName(aqi)}`}>{aqi.toFixed(2)}</td>
-                        <td className=" text-center p-2 bg-indigo-300 text-white border-indigo-800 border-solid border-2">A few minute(s) ago</td>
+                        <td className=" text-center p-2 bg-indigo-300 text-white border-indigo-800 border-solid border-2">{getElapsedTime(timestamp)}</td>
                     </tr>);
                 })}
 
