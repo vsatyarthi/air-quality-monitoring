@@ -108,16 +108,16 @@ function App() {
     }
 
     return (
-        <div className="container">
+        <div className="bg-neutral-100 w-screen h-screen">
             <h1 className="text-3xl font-bold font-bold text-center p-4">Air Quality Checker</h1>
             <div className="flex mr-4">
                 <div className="flex w-96">
                     <table className="table-auto justify-center m-auto">
                         <thead>
                         <tr>
-                            <th className="text-center font-bold p-1 bg-indigo-700 text-white border-indigo-900 border-solid border-2">City</th>
-                            <th className="text-center font-bold p-1 bg-indigo-700 text-white border-indigo-900 border-solid border-2">AQI</th>
-                            <th className="text-center font-bold p-1 bg-indigo-700 text-white border-indigo-900 border-solid border-2">Last
+                            <th className="text-center font-normal p-1 bg-neutral-500 text-white border-indigo-900 border-solid border-2">City</th>
+                            <th className="text-center font-normal p-1 bg-neutral-500 text-white border-indigo-900 border-solid border-2">AQI</th>
+                            <th className="text-center font-normal p-1 bg-neutral-500 text-white border-indigo-900 border-solid border-2">Last
                                 Updated
                             </th>
                         </tr>
@@ -125,7 +125,7 @@ function App() {
                         <tbody>
                         {airQualityData.map(({city, aqi, timestamp}) => {
                             // console.info({airQualityData});
-                            return (<tr key={city} className={`text-center p-1 ${getSeverityClassName(aqi)}}`}>
+                            return (<tr key={city} className={`text-center p-1 ${getSeverityClassName(aqi)}} cursor-pointer hover:border-solid hover:border-black hover:border-2 hover:border-solid hover:shadow-md shadow-inner`}>
                                 <td className="p-4">{city}</td>
                                 <td className={`p-4 ${getSeverityClassName(aqi)}`}>{aqi.toFixed(2)}</td>
                                 <td className="p-4 text-xs">{getElapsedTime(timestamp)}</td>
