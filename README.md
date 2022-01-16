@@ -14,3 +14,5 @@ Technologies used:
 
 Please note this is only front-end that is dependent on the response of the websocket URL. A sample data is included
 within the file itself to test accordingly.
+
+Demo URL: https://air-quality-monitor-demo.herokuapp.com/
