@@ -16,3 +16,5 @@ Please note this is only front-end that is dependent on the response of the webs
 within the file itself to test accordingly.
 
 Demo URL: https://air-quality-monitor-demo.herokuapp.com/
+
+(The heroku app serves over HTTPs, therefore by default it does not allow non HTTPs websocket connect. in order to view our web working, we need to "allow insecure content" for the webpage from the browser address bar -> site settings)
