@@ -25,7 +25,7 @@ const options = {
             position: 'top',
         },
         title: {
-            display: true,
+            display: false,
             text: 'City label should go here',
         },
     },
@@ -43,7 +43,7 @@ export const BarChart = ({aqiData}) => {
         datasets: [
             {
                 label: 'AQI',
-                data: aqiData.map(cityData => cityData.aqi),
+                data: aqiData.map(cityData => cityData.aqi.toFixed(2)),
                 backgroundColor: 'rgba(253,174,104,0.5)',
             }
         ],

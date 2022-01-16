@@ -110,34 +110,36 @@ function App() {
     return (
         <div className="container">
             <h1 className="text-3xl font-bold font-bold text-center p-4">Air Quality Checker</h1>
-            <table className="table-auto justify-center m-auto">
-                <thead>
-                <tr>
-                    <th className="text-center font-bold p-2 bg-indigo-700 text-white border-indigo-900 border-solid border-2">City</th>
-                    <th className="text-center font-bold p-2 bg-indigo-700 text-white border-indigo-900 border-solid border-2">Current
-                        AQI
-                    </th>
-                    <th className="text-center font-bold p-2 bg-indigo-700 text-white border-indigo-900 border-solid border-2">Last
-                        Updated
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {airQualityData.map(({city, aqi, timestamp}) => {
-                    // console.info({airQualityData});
-                    return (<tr key={city} className={`text-center p-2 ${getSeverityClassName(aqi)}}`}>
-                        <td className="p-4">{city}</td>
-                        <td className={`p-4 ${getSeverityClassName(aqi)}`}>{aqi.toFixed(2)}</td>
-                        <td className="p-4">{getElapsedTime(timestamp)}</td>
-                    </tr>);
-                })}
+            <div className="flex mr-4">
+                <div className="flex w-96">
+                    <table className="table-auto justify-center m-auto">
+                        <thead>
+                        <tr>
+                            <th className="text-center font-bold p-1 bg-indigo-700 text-white border-indigo-900 border-solid border-2">City</th>
+                            <th className="text-center font-bold p-1 bg-indigo-700 text-white border-indigo-900 border-solid border-2">AQI</th>
+                            <th className="text-center font-bold p-1 bg-indigo-700 text-white border-indigo-900 border-solid border-2">Last
+                                Updated
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {airQualityData.map(({city, aqi, timestamp}) => {
+                            // console.info({airQualityData});
+                            return (<tr key={city} className={`text-center p-1 ${getSeverityClassName(aqi)}}`}>
+                                <td className="p-4">{city}</td>
+                                <td className={`p-4 ${getSeverityClassName(aqi)}`}>{aqi.toFixed(2)}</td>
+                                <td className="p-4 text-xs">{getElapsedTime(timestamp)}</td>
+                            </tr>);
+                        })}
 
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
 
-            <hr/>
-
-            <BarChart aqiData={airQualityData} standards={AirQualityStandards}/>
+                <div className="flex flex-grow">
+                    <BarChart aqiData={airQualityData} standards={AirQualityStandards}/>
+                </div>
+            </div>
         </div>
 
     );
